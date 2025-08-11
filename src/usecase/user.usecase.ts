@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../database/entities/user.entity';
+import { User } from '../domain/entity/user';
 
 export interface CreateUserDto {
   email: string;
@@ -18,7 +18,7 @@ export interface UpdateUserDto {
 }
 
 @Injectable()
-export class UserService {
+export class UserUsecase {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
