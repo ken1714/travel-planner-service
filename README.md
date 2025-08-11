@@ -24,39 +24,136 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+旅行プランナーサービスのバックエンドAPI。NestJS + TypeORM + PostgreSQLで構築されています。
 
-## Installation
+## 技術スタック
 
-```bash
-$ npm install
-```
+- **Framework**: NestJS v10
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: TypeORM
+- **Container**: Docker & Docker Compose
 
-## Running the app
+## Prerequisites
 
-```bash
-# development
-$ npm run start
+- Node.js (v18以上)
+- Docker & Docker Compose
+- npm
 
-# watch mode
-$ npm run start:dev
+## セットアップ
 
-# production mode
-$ npm run start:prod
-```
-
-## Test
+### 1. 依存関係のインストール
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
+
+### 2. 環境変数の設定
+
+```bash
+cp .env.example .env
+```
+
+必要に応じて`.env`ファイルの内容を編集してください。
+
+### 3. データベースの起動
+
+```bash
+docker compose up -d postgres
+```
+
+### 4. マイグレーション実行
+
+```bash
+npm run migration:run
+```
+
+## アプリケーションの起動
+
+```bash
+# 開発モード（ホットリロード有効）
+npm run start:dev
+
+# 本番モード
+npm run start:prod
+
+# デバッグモード
+npm run start:debug
+```
+
+アプリケーションは http://localhost:3000 で起動します。
+
+## API エンドポイント
+
+### 基本API
+- `GET /` - ヘルスチェック
+
+### User API
+- `GET /users` - ユーザー一覧取得
+- `GET /users/:id` - ユーザー詳細取得  
+- `POST /users` - ユーザー作成
+- `PATCH /users/:id` - ユーザー更新
+- `DELETE /users/:id` - ユーザー削除
+
+## データベース操作
+
+```bash
+# マイグレーション実行
+npm run migration:run
+
+# マイグレーション取り消し
+npm run migration:revert
+
+# マイグレーション生成
+npm run migration:generate
+
+# データベースリセット
+npm run db:reset
+```
+
+## テスト
+
+```bash
+# 単体テスト
+npm run test
+
+# E2Eテスト
+npm run test:e2e
+
+# テストカバレッジ
+npm run test:cov
+
+# テスト（ウォッチモード）
+npm run test:watch
+```
+
+## コード品質
+
+```bash
+# リンター実行
+npm run lint
+
+# フォーマッター実行
+npm run format
+
+# ビルド
+npm run build
+```
+
+## 開発用ツール
+
+### pgAdmin
+データベース管理用のpgAdminが利用できます：
+- URL: http://localhost:8080
+- Email: admin@example.com  
+- Password: admin
+
+PostgreSQL接続情報：
+- Host: postgres
+- Port: 5432
+- Database: travel_planner_db
+- Username: travel_planner
+- Password: password
 
 ## Support
 
