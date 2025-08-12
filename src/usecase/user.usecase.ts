@@ -37,6 +37,10 @@ export class UserUsecase {
     return this.userRepository.findOne({ where: { id } });
   }
 
+  async findById(id: string): Promise<User | null> {
+    return this.findOne(id);
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({ where: { email } });
   }
@@ -48,5 +52,9 @@ export class UserUsecase {
 
   async remove(id: string): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.remove(id);
   }
 }
