@@ -52,8 +52,8 @@ src/
 
 #### 重要な命名規則
 - **Entity**: `user.ts` (not `user.entity.ts`)
-- **Usecase**: `user.ts` (not `user.service.ts`, not `user.usecase.ts`)
-- **Controller**: `user.ts` (not `user.controller.ts`)
+- **Usecase**: `user.ts` (not `user.service.ts`)
+- **Controller**: `user.ts`
 
 #### 実装例
 ```typescript
@@ -469,10 +469,10 @@ import { Injectable, type Logger } from '@nestjs/common';
 ## ファイル・ディレクトリ構造規約
 
 ### 1. ファイル命名
-- **機能名 + 種別**: `user.usecase.ts`, `user.controller.ts`
+- **機能名のみ**: `user.ts`
 - **Entity**: `user.ts` (`.entity.ts`サフィックス不要)
 - **DTO**: `create-user.dto.ts`, `update-user.dto.ts`
-- **テスト**: `user.usecase.spec.ts`, `user.e2e-spec.ts`
+- **テスト**: `user.spec.ts`, `user.e2e-spec.ts`
 
 ### 2. ディレクトリ構造
 ```
