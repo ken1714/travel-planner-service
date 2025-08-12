@@ -40,7 +40,9 @@ src/
 ```
 src/
 ├── presentation/       # プレゼンテーション層
-│   └── *.ts            # Controllers
+│   ├── resolver/       # GraphQL Resolvers
+│   ├── dto/           # Data Transfer Objects
+│   └── *.ts           # Controllers
 ├── usecase/            # ユースケース層
 │   └── *.ts            # Usecases (Serviceではない)
 ├── domain/             # ドメイン層
@@ -52,8 +54,10 @@ src/
 
 #### 重要な命名規則
 - **Entity**: `user.ts` (not `user.entity.ts`)
-- **Usecase**: `user.ts` (not `user.service.ts`)
-- **Controller**: `user.ts`
+- **Usecase**: `user.ts` (not `user.usecase.ts`)
+- **Controller**: `user.ts` (not `user.controller.ts`)
+- **Resolver**: `user.ts` (not `user.resolver.ts`)
+- **DTO**: `user.ts` (not `user.dto.ts`)
 
 #### 実装例
 ```typescript
@@ -452,8 +456,8 @@ import { User } from '@/domain/entities/user';
 import { UserRepository } from '@/domain/repositories/user-repository';
 
 // 4. 相対インポート
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserMapper } from '../mappers/user.mapper';
+import { CreateUserDto } from './dto/user';
+import { UserMapper } from '../mappers/user';
 ```
 
 ### 2. 型のみのインポート
@@ -471,7 +475,10 @@ import { Injectable, type Logger } from '@nestjs/common';
 ### 1. ファイル命名
 - **機能名のみ**: `user.ts`
 - **Entity**: `user.ts` (`.entity.ts`サフィックス不要)
-- **DTO**: `create-user.dto.ts`, `update-user.dto.ts`
+- **Usecase**: `user.ts` (`.usecase.ts`サフィックス不要)
+- **Controller**: `user.ts` (`.controller.ts`サフィックス不要)
+- **Resolver**: `user.ts` (`.resolver.ts`サフィックス不要)
+- **DTO**: `user.ts` (`.dto.ts`サフィックス不要)
 - **テスト**: `user.spec.ts`, `user.e2e-spec.ts`
 
 ### 2. ディレクトリ構造
