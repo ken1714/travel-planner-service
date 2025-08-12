@@ -174,10 +174,12 @@ npm run test
 #### ディレクトリ構造
 ```
 src/
-├── presentation/         # Controllers
-│   └── *.controller.ts
+├── presentation/         # Controllers, Resolvers, DTOs
+│   ├── resolver/         # GraphQL Resolvers
+│   ├── dto/             # Data Transfer Objects
+│   └── *.ts             # Controllers
 ├── usecase/             # Usecases（Serviceではない）
-│   └── *.usecase.ts
+│   └── *.ts
 ├── domain/              # Domain entities
 │   └── entity/
 │       └── *.ts         # Entity files（.entity.tsサフィックス不要）
@@ -187,8 +189,10 @@ src/
 
 #### ファイル命名規則
 - **Entity**: `user.ts` (not `user.entity.ts`)
-- **Usecase**: `user.usecase.ts` (not `user.service.ts`)
-- **Controller**: `user.controller.ts`
+- **Usecase**: `user.ts` (not `user.usecase.ts`)
+- **Controller**: `user.ts` (not `user.controller.ts`)
+- **Resolver**: `user.ts` (not `user.resolver.ts`)
+- **DTO**: `user.ts` (not `user.dto.ts`)
 
 #### 環境変数のデフォルト値設定
 - **禁止**: 設定ファイルやDocker Composeでデフォルト値を設定

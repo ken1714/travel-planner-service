@@ -7,7 +7,7 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
-import { UserUsecase, CreateUserDto, UpdateUserDto } from '../usecase/user.usecase';
+import { UserUsecase, CreateUserDto, UpdateUserDto } from '../usecase/user';
 
 @Controller('users')
 export class UserController {
