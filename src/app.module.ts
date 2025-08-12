@@ -22,7 +22,7 @@ import { UserModule } from './modules/user/user.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
-      playground: process.env.NODE_ENV !== 'production',
+      playground: process.env.NODE_ENV === 'development',
       introspection: true,
     }),
     UserModule,
