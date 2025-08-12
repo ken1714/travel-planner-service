@@ -11,20 +11,22 @@
 ```
 src/
 ├── presentation/     # プレゼンテーション層（Controller）
-├── application/      # アプリケーション層（UseCase, Service）
+├── usecase/         # ユースケース層（Usecase）
 ├── domain/          # ドメイン層（Entity, Repository Interface）
+│   └── entity/      # Entities
 └── infrastructure/  # インフラストラクチャ層（Repository Implementation, External API）
+    └── config/      # 設定ファイル
 ```
 
 **層の責務:**
 - **プレゼンテーション層**: HTTPリクエスト/レスポンス、バリデーション、認証・認可
-- **アプリケーション層**: ビジネスロジックの組み合わせ、トランザクション管理
+- **ユースケース層**: ビジネスロジックの組み合わせ、トランザクション管理
 - **ドメイン層**: 核となるビジネスルール、エンティティ、値オブジェクト
 - **インフラストラクチャ層**: データベースアクセス、外部API連携、技術的実装
 
 **依存関係の方向:**
 ```
-プレゼンテーション層 → アプリケーション層 → ドメイン層 ← インフラストラクチャ層
+プレゼンテーション層 → ユースケース層 → ドメイン層 ← インフラストラクチャ層
 ```
 
 ### 2. ドメイン駆動設計（DDD）
@@ -34,12 +36,31 @@ src/
 - エンティティや値オブジェクト内でビジネスルールを表現
 - アプリケーション層はドメインオブジェクトの組み合わせのみ
 
+#### ディレクトリ構造とファイル配置
+```
+src/
+├── presentation/       # プレゼンテーション層
+│   └── *.ts            # Controllers
+├── usecase/            # ユースケース層
+│   └── *.ts            # Usecases (Serviceではない)
+├── domain/             # ドメイン層
+│   └── entity/         # Entities
+│       └── *.ts        # Entity files (`.entity.ts`サフィックス不要)
+└── infrastructure/     # インフラストラクチャ層
+    └── config/         # 設定ファイル
+```
+
+#### 重要な命名規則
+- **Entity**: `user.ts` (not `user.entity.ts`)
+- **Usecase**: `user.ts` (not `user.service.ts`)
+- **Controller**: `user.ts`
+
 #### 実装例
 ```typescript
-// ❌ アプリケーション層にビジネスロジック
-export class UserService {
+// ❌ ユースケース層にビジネスロジック
+export class UserUsecase {
   createUser(userData: CreateUserDto) {
-    // ビジネスルールをサービスに記述（NG）
+    // ビジネスルールをユースケースに記述（NG）
     if (userData.age < 18) {
       throw new Error('18歳未満は登録できません');
     }
@@ -448,46 +469,85 @@ import { Injectable, type Logger } from '@nestjs/common';
 ## ファイル・ディレクトリ構造規約
 
 ### 1. ファイル命名
-- **機能名 + 種別**: `user.service.ts`, `user.controller.ts`
+- **機能名のみ**: `user.ts`
+- **Entity**: `user.ts` (`.entity.ts`サフィックス不要)
 - **DTO**: `create-user.dto.ts`, `update-user.dto.ts`
-- **テスト**: `user.service.spec.ts`, `user.e2e-spec.ts`
+- **テスト**: `user.spec.ts`, `user.e2e-spec.ts`
 
 ### 2. ディレクトリ構造
 ```
 src/
 ├── presentation/
-│   ├── controllers/
-│   ├── dto/
-│   └── filters/
-├── application/
-│   ├── services/
-│   ├── use-cases/
-│   └── interfaces/
+│   └── *.ts              # Controllers
+├── usecase/
+│   └── *.ts              # Usecases
 ├── domain/
-│   ├── entities/
-│   ├── value-objects/
-│   ├── repositories/
-│   └── services/
+│   ├── entity/           # Entities
+│   ├── value-objects/    # Value Objects
+│   └── repositories/     # Repository Interfaces
 └── infrastructure/
-    ├── repositories/
-    ├── external/
-    └── config/
+    ├── repositories/     # Repository Implementations
+    ├── external/         # External API clients
+    └── config/           # Configuration files
 ```
 
 ## 定数管理
 
 ### 1. 設定値の外部化
-```typescript
-// ❌ ハードコーディング
-const maxRetryCount = 3;
-const timeout = 5000;
 
-// ✅ 環境変数または設定ファイルから取得
-export const CONFIG = {
-  MAX_RETRY_COUNT: process.env.MAX_RETRY_COUNT || '3',
-  TIMEOUT: process.env.TIMEOUT || '5000',
-  API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3000'
-} as const;
+#### 環境変数のデフォルト値設定ポリシー
+**重要**: 環境変数にはデフォルト値を設定しない。すべての設定値は明示的に.envファイルで管理する。
+
+```typescript
+// ❌ 設定ファイルでデフォルト値を設定
+export const getDatabaseConfig = (
+  configService: ConfigService,
+): TypeOrmModuleOptions => ({
+  type: 'postgres',
+  host: configService.get<string>('DB_HOST', 'localhost'),      // NG
+  port: configService.get<number>('DB_PORT', 5432),           // NG
+  username: configService.get<string>('DB_USERNAME', 'user'), // NG
+  password: configService.get<string>('DB_PASSWORD', 'pass'), // NG
+});
+
+// ✅ デフォルト値なしで環境変数を取得
+export const getDatabaseConfig = (
+  configService: ConfigService,
+): TypeOrmModuleOptions => ({
+  type: 'postgres',
+  host: configService.get<string>('DB_HOST'),
+  port: configService.get<number>('DB_PORT'),
+  username: configService.get<string>('DB_USERNAME'),
+  password: configService.get<string>('DB_PASSWORD'),
+});
+```
+
+#### Docker Composeでの環境変数設定
+```yaml
+# ❌ docker-compose.ymlでデフォルト値を設定
+environment:
+  POSTGRES_DB: ${DB_DATABASE:-travel_db}        # NG
+  POSTGRES_USER: ${DB_USERNAME:-travel_user}   # NG
+
+# ✅ .envファイルから環境変数を読み込み
+environment:
+  POSTGRES_DB: ${DB_DATABASE}
+  POSTGRES_USER: ${DB_USERNAME}
+  POSTGRES_PASSWORD: ${DB_PASSWORD}
+```
+
+#### .envファイルでの設定値管理
+```bash
+# .env.development
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=travel_planner
+DB_PASSWORD=password
+DB_DATABASE=travel_planner_db
+
+# pgAdmin設定
+PGADMIN_DEFAULT_EMAIL=admin@example.com
+PGADMIN_DEFAULT_PASSWORD=admin
 ```
 
 ### 2. マジックナンバーの排除

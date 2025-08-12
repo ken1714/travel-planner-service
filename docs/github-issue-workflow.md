@@ -25,17 +25,116 @@ git checkout -b feature/issue-123-add-user-authentication
 
 ### 2. コミット戦略
 
-コミットは分解可能な最小の粒度で行い、意味のある単位で区切ってください。
+#### 2.1. コミット粒度の基本原則
 
-**良いコミットの例:**
+**重要**: コミットは**分解可能な最小単位**で行うこと。一つのコミットで複数の異なる変更を含めることは避けてください。
+
+#### 2.2. 適切なコミット粒度の判断基準
+
+**✅ 良いコミット粒度（OK例）:**
+- 一つの機能追加または修正に対して一つのコミット
+- レビュー時に変更内容が一目で理解できる
+- 必要に応じて個別にrevertできる
+- ビルドが通る状態を保持している
+
+**❌ 悪いコミット粒度（NG例）:**
+- 複数の機能追加を一度にコミット
+- 関連のない変更を混在させる
+- あまりにも細かすぎて意味をなさない変更
+- ビルドが通らない中間状態のコミット
+
+#### 2.3. 具体的なNG例とOK例
+
+**❌ NG例: 多くの変更をひとまとめにコミット**
 ```bash
-git commit -m "[feat] ユーザー認証のルーティング設定を追加"
-git commit -m "[feat] ログイン用のコントローラーとサービスを実装"
-git commit -m "[test] ユーザー認証機能の単体テストを追加"
-git commit -m "[docs] 認証API仕様をREADMEに追記"
+# 複数の異なる変更を一つのコミットに含めている（NG）
+git commit -m "[feat] ユーザー管理機能の実装"
+# 含まれる変更:
+# - User Entityの追加
+# - UserController、UserUsecaseの実装  
+# - バリデーション機能の追加
+# - 認証ミドルウェアの実装
+# - データベースマイグレーション
+# - テストケースの追加
+# - API仕様書の更新
 ```
 
-**コミットメッセージ規則:**
+**✅ OK例: 分解可能な最小単位でコミット**
+```bash
+# 各変更を独立したコミットに分解（OK）
+git commit -m "[feat] User Entityクラスを追加"
+git commit -m "[feat] UserControllerにCRUD APIエンドポイントを実装"  
+git commit -m "[feat] UserUsecaseにビジネスロジックを実装"
+git commit -m "[feat] ユーザー入力バリデーション機能を追加"
+git commit -m "[feat] JWT認証ミドルウェアを実装"
+git commit -m "[feat] ユーザー管理用データベースマイグレーションを追加"
+git commit -m "[test] User機能の単体テストを追加"
+git commit -m "[test] User APIのE2Eテストを追加"
+git commit -m "[docs] User API仕様をREADMEに追記"
+```
+
+#### 2.4. コミット分解の実践例
+
+**シナリオ**: ユーザープロフィール機能の実装
+
+**❌ NG例（まとめてコミット）:**
+```bash
+git add .
+git commit -m "[feat] ユーザープロフィール機能を実装"
+# 20ファイルの変更、300行の追加・削除が含まれる
+```
+
+**✅ OK例（段階的コミット）:**
+```bash
+# 1. Entityの追加
+git add src/domain/entity/profile.ts
+git commit -m "[feat] UserProfile Entityを追加"
+
+# 2. DTOの定義
+git add src/presentation/dto/profile.dto.ts  
+git commit -m "[feat] プロフィール操作用DTOを定義"
+
+# 3. Repository interfaceの追加
+git add src/domain/repositories/profile-repository.ts
+git commit -m "[feat] ProfileRepositoryインターフェースを定義"
+
+# 4. Repository implementationの実装
+git add src/infrastructure/repositories/profile.repository.ts
+git commit -m "[feat] ProfileRepositoryの実装を追加"
+
+# 5. Usecaseの実装
+git add src/usecase/profile.usecase.ts
+git commit -m "[feat] プロフィール操作のUsecaseを実装"
+
+# 6. Controllerの実装
+git add src/presentation/profile.controller.ts
+git commit -m "[feat] プロフィールAPIのControllerを実装"
+
+# 7. バリデーションルールの追加
+git add src/presentation/validators/profile.validator.ts
+git commit -m "[feat] プロフィール入力バリデーションを追加"
+
+# 8. 単体テストの追加
+git add src/usecase/profile.usecase.spec.ts
+git commit -m "[test] プロフィールUsecase単体テストを追加"
+
+# 9. E2Eテストの追加  
+git add test/profile.e2e-spec.ts
+git commit -m "[test] プロフィールAPIのE2Eテストを追加"
+```
+
+#### 2.5. コミット前のセルフチェック
+
+コミット前に以下を確認してください:
+
+- [ ] このコミットは**一つの明確な目的**を持っているか？
+- [ ] このコミットは**他の変更と独立して理解**できるか？
+- [ ] このコミットは**必要に応じて個別にrevert**できるか？
+- [ ] このコミットの状態で**ビルドが通る**か？
+- [ ] コミットメッセージで**変更内容が明確に説明**されているか？
+
+#### 2.6. コミットメッセージ規則
+
 - `[feat]` - 新機能の追加
 - `[fix]` - バグ修正
 - `[docs]` - ドキュメントの更新
@@ -66,6 +165,41 @@ npm run build
 
 # 単体テストの実行
 npm run test
+```
+
+### 4.1. アーキテクチャ規約の遵守
+
+開発時は必ずコーディング規約（`docs/coding-standards.md`）に従って実装してください:
+
+#### ディレクトリ構造
+```
+src/
+├── presentation/         # Controllers
+│   └── *.controller.ts
+├── usecase/             # Usecases（Serviceではない）
+│   └── *.usecase.ts
+├── domain/              # Domain entities
+│   └── entity/
+│       └── *.ts         # Entity files（.entity.tsサフィックス不要）
+└── infrastructure/      # Infrastructure layer
+    └── config/          # Configuration files
+```
+
+#### ファイル命名規則
+- **Entity**: `user.ts` (not `user.entity.ts`)
+- **Usecase**: `user.usecase.ts` (not `user.service.ts`)
+- **Controller**: `user.controller.ts`
+
+#### 環境変数のデフォルト値設定
+- **禁止**: 設定ファイルやDocker Composeでデフォルト値を設定
+- **必須**: すべての環境変数は.envファイルで明示的に管理
+
+```typescript
+// ❌ NG例
+configService.get<string>('DB_HOST', 'localhost')
+
+// ✅ OK例
+configService.get<string>('DB_HOST')
 ```
 
 ### 5. プルリクエスト（PR）の作成
