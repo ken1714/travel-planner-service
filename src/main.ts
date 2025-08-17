@@ -32,8 +32,5 @@ async function bootstrap() {
 
   await app.listen(3000);
   console.log('🚀 GraphQL Server ready at http://localhost:3000/graphql');
-  console.log(
-    '🌐 Apollo Studio Sandbox: https://studio.apollographql.com/sandbox/explorer?endpoint=http://localhost:3000/graphql',
-  );
 }
 bootstrap();
