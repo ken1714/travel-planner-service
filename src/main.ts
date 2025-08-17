@@ -14,13 +14,9 @@ async function bootstrap() {
     }),
   );
 
-  // Apollo Studio Sandbox対応のCORS設定
+  // 開発環境用のCORS設定
   app.enableCors({
-    origin: [
-      'https://studio.apollographql.com',
-      'https://apollo-server-landing-page.cdn.apollographql.com',
-      'http://localhost:3000',
-    ],
+    origin: ['http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: [
