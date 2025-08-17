@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // グローバルバリデーション
   app.useGlobalPipes(
     new ValidationPipe({
@@ -23,11 +23,17 @@ async function bootstrap() {
     ],
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Apollo-Require-Preflight'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Apollo-Require-Preflight',
+    ],
   });
-  
+
   await app.listen(3000);
   console.log('🚀 GraphQL Server ready at http://localhost:3000/graphql');
-  console.log('🌐 Apollo Studio Sandbox: https://studio.apollographql.com/sandbox/explorer?endpoint=http://localhost:3000/graphql');
+  console.log(
+    '🌐 Apollo Studio Sandbox: https://studio.apollographql.com/sandbox/explorer?endpoint=http://localhost:3000/graphql',
+  );
 }
 bootstrap();
