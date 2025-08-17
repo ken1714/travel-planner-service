@@ -26,7 +26,7 @@ import { UserModule } from './modules/user/user.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
-      introspection: true,
+      introspection: process.env.NODE_ENV !== 'production',
       playground: false,
       plugins: [
         process.env.NODE_ENV === 'production'
