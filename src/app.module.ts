@@ -32,7 +32,7 @@ import { UserModule } from './modules/user/user.module';
         process.env.NODE_ENV === 'production'
           ? ApolloServerPluginLandingPageProductionDefault({
               embed: true,
-              graphRef: 'travel-planner@current',
+              graphRef: process.env.APOLLO_GRAPH_REF || 'travel-planner@current',
             })
           : ApolloServerPluginLandingPageLocalDefault({ embed: true }),
       ],
