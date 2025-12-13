@@ -14,9 +14,15 @@ async function bootstrap() {
     }),
   );
 
-  // 開発環境用のCORS設定
+  // 開発環境用のCORS設定（localhostからの通信はすべて許可）
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: (origin, callback) => {
+      if (!origin || /https?:\/\/localhost(:\d+)?$/.test(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error('Not allowed by CORS'), false);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: [
